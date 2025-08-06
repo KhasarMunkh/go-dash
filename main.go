@@ -85,6 +85,7 @@ type League struct {
 }
 
 type Match struct {
+	Name      string          `json:"name"`
 	Id        int             `json:"id"`
 	Date      string          `json:"scheduled_at"`
 	BeginAt   time.Time       `json:"begin_at"`

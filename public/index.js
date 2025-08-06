@@ -34,7 +34,8 @@ async function loadMatches() {
             .join("");
 
         card.innerHTML = `
-      <h2>${match.name}</h2>
+      <h1>${match.league.name}</h1> 
+      <h2>${match.name}</h2> 
       <p>Start Time: ${timeString}</p>
       <div class="teams">${teamHTML}</div>
     `;
