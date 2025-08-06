@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Esports Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .match-card {
+      border: 1px solid #475569;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      background: #1e293b;
+    }
+    .teams {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .team {
+      text-align: center;
+    }
+    .team img {
+      width: 100px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upcoming Matches</h1>
+  <div id="matches">Loading...</div>
+
+  <script src="index.js"></script>
+</body>
+</html>
