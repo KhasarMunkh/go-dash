@@ -88,7 +88,7 @@ func RequestSeries() () {
 	req, _ := http.NewRequest("GET", url, nil)
 
 	req.Header.Add("accept", "application/json")
-	req.Header.Add("authorization", "Bearer 2MO8I9xEUefnWHxXsVmZyRxmMtRXlIxyX1ZfyZ1W8EHMnJko6a0")
+	req.Header.Add("authorization", "Bearer " + api_key)
 
 	res, _ := http.DefaultClient.Do(req)
 
