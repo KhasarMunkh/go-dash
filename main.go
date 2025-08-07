@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -14,6 +14,7 @@ import (
 var (
 	base    = "https://api.pandascore.co"
 	api_key string
+	lrID = 135916
 )
 
 func init() {
@@ -51,11 +52,13 @@ func GetUpcomingMatchesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode matches", http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("Successfully fetched and returned matches")
 }
 
 func RequestMatches() ([]Match, error) {
 	fmt.Println("Requesting matches...")
-	url := base + "/lol/matches/upcoming?filter[opponent_id]=t1,gen-g"
+	// url := base + "/lol/matches/upcoming?filter[opponent_id]=t1,gen-g"
+	 url := base + "/lol/matches/upcoming?page[size]=5&page[number]=1"
 
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -78,29 +81,44 @@ func RequestMatches() ([]Match, error) {
 	return m, nil
 }
 
-type League struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	ImageURL string `json:"image_url"`
+func RequestSeries() () {
+	fmt.Println("Requesting series...")
+	// url := base + "/lol/series/upcoming?page[size]=5&page[number]=1"
+	url := base+ "/lol/series/running?sort=begin_at&page=1&per_page=1"
+	req, _ := http.NewRequest("GET", url, nil)
+
+	req.Header.Add("accept", "application/json")
+	req.Header.Add("authorization", "Bearer 2MO8I9xEUefnWHxXsVmZyRxmMtRXlIxyX1ZfyZ1W8EHMnJko6a0")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+
+	fmt.Println(string(body))
 }
 
-type Match struct {
-	Name      string          `json:"name"`
-	Id        int             `json:"id"`
-	Date      string          `json:"scheduled_at"`
-	BeginAt   time.Time       `json:"begin_at"`
-	Opponents []OpponentEntry `json:"opponents"`
-	League    League          `json:"league"`
-}
+func RequestUpcomingByTeam(teamID int) ([]Match, error) {
+	fmt.Printf("Requesting upcoming matches for team ID: %d\n", teamID)
+	url := fmt.Sprintf("%s/lol/matches/upcoming?filter[opponent_id]=%d", base, teamID)
 
-type OpponentEntry struct {
-	Opponent Team `json:"opponent"`
-}
+	req, _ := http.NewRequest("GET", url, nil)
 
-type Team struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Location string `json:"location"`
-	Acronym  string `json:"acronym"`
-	ImageURL string `json:"image_url"`
+	req.Header.Add("accept", "application/json")
+	req.Header.Add("authorization", "Bearer "+api_key)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	var m []Match
+
+	if err := json.NewDecoder(res.Body).Decode(&m); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
