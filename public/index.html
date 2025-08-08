@@ -1,41 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <title>Esports Dashboard</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      background: #0f172a;
-      color: #f1f5f9;
-    }
-    .match-card {
-      border: 1px solid #475569;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      background: #1e293b;
-    }
-    .teams {
-      display: flex;
-      gap: 2rem;
-      margin-top: 1rem;
-    }
-    .team {
-      text-align: center;
-    }
-    .team img {
-      width: 100px;
-      height: auto;
-    }
-  </style>
 </head>
 <body>
-  <h1>Upcoming Matches</h1>
-  <div id="matches">Loading...</div>
+  <header class="topbar">
+    <h1>Esports Dashboard</h1>
+    <div class="actions">
+      <button id="refresh">Refresh</button>
+      <button id="settings">⚙️</button>
+    </div>
+  </header>
 
-  <script src="/index.js?v=7" defer></script>
+  <!-- Filters toolbar -->
+  <section class="toolbar">
+    <label>Region
+      <select id="region">
+        <option value="">All</option>
+        <option value="NA">NA</option>
+        <option value="EU">EU</option>
+        <option value="KR">KR</option>
+        <option value="CN">CN</option>
+      </select>
+    </label>
+
+    <label>Game
+      <select id="game">
+        <option value="">All</option>
+        <option value="lol">LoL</option>
+        <option value="val">VALORANT</option>
+        <option value="dota2">Dota 2</option>
+      </select>
+    </label>
+
+    <!-- Reuse the team picker you built -->
+    <details id="teamsMenu">
+      <summary><span id="teamsSummary">Followed teams (0)</span></summary>
+      <div class="menu">
+        <input id="teamsSearch" type="search" placeholder="Search teams…" />
+        <div class="menu-row">
+          <button id="teamsSelectAll" type="button">Select all</button>
+          <button id="teamsClear" type="button">Clear</button>
+          <button id="teamsSave" type="button">Save</button>
+        </div>
+        <div id="teamsList" class="teams-list"></div>
+      </div>
+    </details>
+
+    <label>
+      <input type="checkbox" id="onlyFollowed" />
+      Only followed
+    </label>
+  </section>
+
+  <!-- Main 2-pane layout -->
+  <main class="layout">
+    <section id="upcoming" class="column">
+      <h2>Upcoming</h2>
+      <div id="upcomingList" class="cards"></div>
+    </section>
+
+    <aside id="live" class="column">
+      <h2>Live Now</h2>
+      <div id="liveList" class="cards"></div>
+    </aside>
+  </main>
+
+  <script src="index.js" defer></script>
 </body>
 </html>
