@@ -1,99 +1,197 @@
+const el = (id) => document.getElementById(id);
+
+/* ----Filter Toolbar ----- */
+const regionEl = el("region");
+const gameEl = el("game");
+const onlyFollowedEl = el("onlyFollowed");
+const refreshBtn = el("refreshBtn");
+
+/* ----Teams Menu ----- */
+const teamsMenu = el("teamsMenu");
+const menu = el("menu");
+const teamsSummary = el("teamsSummary");
+const teamSearchEl = el("teamSearch");
+const teamsList = el("teamsList");
+const teamsSelectAllBtn = el("teamsSelectAllBtn")
+const teamsClearBtn = el("teamsClearBtn")
+const teamsSaveBtn = el("teamsSaveBtn")
+
+/* ----Matches ----- */
+const upcomingMatchList = el("upcomingMatchList");
+const liveMatchList = el("liveMatchList"); // TODO
+
 const KEY = "followedTeams.v1";
 let followed = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
-
-const els = {
-  region: document.getElementById("region"),
-  game: document.getElementById("game"),
-  onlyFollowed: document.getElementById("onlyFollowed"),
-  refresh: document.getElementById("refresh"),
-  upcomingList: document.getElementById("upcomingList"),
-  liveList: document.getElementById("liveList"),
-  teamsSummary: document.getElementById("teamsSummary"),
-  teamsMenu: document.getElementById("teamsMenu"),
-  teamsSearch: document.getElementById("teamsSearch"),
-  teamsList: document.getElementById("teamsList"),
-  btnSelAll: document.getElementById("teamsSelectAll"),
-  btnClear: document.getElementById("teamsClear"),
-  btnSave: document.getElementById("teamsSave"),
-};
-
-// TODO: wire to your Go API
-async function fetchUpcoming(params) {
-  // return (await fetch(`/api/upcoming?${new URLSearchParams(params)}`)).json();
-  return []; // placeholder
-}
-async function fetchLive(params) {
-  // return (await fetch(`/api/live?${new URLSearchParams(params)}`)).json();
-  return []; // placeholder
+function saveFollowed() {
+    localStorage.setItem(KEY, JSON.stringify([...followed]));
+    teamsSummary.textContent = `Followed teams (${followed.size})`;
 }
 
-function renderMatches(list, mount) {
-  if (!list.length) { mount.innerHTML = '<div class="card">No matches.</div>'; return; }
-  mount.innerHTML = list.map(m => `
-    <div class="card">
-      <div>
-        <strong>${m.tournament}</strong><br/>
-        ${m.teamA} vs ${m.teamB}
-      </div>
-      <div style="text-align:right">
-        <div>${new Date(m.startsAt).toLocaleString()}</div>
-        ${m.status === "live" ? '<span>🔴 Live</span>' : ""}
-      </div>
-    </div>
-  `).join("");
+saveFollowed();
+
+function renderEmpty() {
+    upcomingMatchList.innerHTML = `<div class="card">Loading...</div>`;
+    liveMatchList.innerHTML = `<div class="card" style="opacity:.7">workin on it...</div>`;
+}
+renderEmpty();
+
+async function fetchUpcoming({ game, teamIDs }) {
+    const u = new URL("/api/upcoming-matches", location.origin);
+    if (game) {
+        u.searchParams.set("game", game);
+    }
+    if (onlyFollowedEl.checked && teamIDs.length) {
+        u.searchParams.set("teamIDs", teamIDs.join(","));
+    }
+    const res = fetch(u);
+    if (!res.ok) {
+        throw new Error("Failed to fetch upcoming matches");
+    }
+    return res.json();
+}
+
+function renderUpcoming(list, mount) {
+    if (!list || !list.length) {
+        mount.innerHTML = `<div class="card">No matches...</div>`;
+        return;
+    }
+    mount.innerHTML = list
+        .map((m) => {
+            const a = m.opponents?.[0]?.opponent ?? {};
+            const b = m.opponents?.[1]?.opponent ?? {};
+            const when = new Date(m.scheduled_at).toLocaleString();
+            const lName = m.league?.name ?? "";
+
+            const aLogo = a.image_url
+                ? `<img class="team-logo" src="${a.image_url}" alt="${a.name || "Team"} logo" loading="lazy" decoding="async">`
+                : `<span class="team-chip">${a.acronym || (a.name?.[0] ?? "??")}</span>`;
+
+            const bLogo = b.image_url
+                ? `<img class="team-logo" src="${b.image_url}" alt="${b.name || "Team"} logo" loading="lazy" decoding="async">`
+                : `<span class="team-chip">${b.acronym || (b.name?.[0] ?? "??")}</span>`;
+
+            const leagueLogo = m.league?.image_url
+                ? `<img class="league-logo" src="${m.league.image_url}" alt="${lName}" loading="lazy" decoding="async">`
+                : "";
+
+            return `
+      <article class="card"
+               data-match-id="${m.id}"
+               data-a-id="${a.id ?? ""}"
+               data-b-id="${b.id ?? ""}">
+        <div class="card-left">
+          ${aLogo}
+          <span class="team-name">${a.name ?? "TBD"}</span>
+          <span class="vs">vs</span>
+          ${bLogo}
+          <span class="team-name">${b.name ?? "TBD"}</span>
+        </div>
+        <div class="card-right">
+          <div class="league">${leagueLogo}<span>${m.league?.name ?? ""}</span></div>
+          <time datetime="${m.begin_at || ""}">${when}</time>
+        </div>
+      </article>
+    `;
+        })
+        .join("");
 }
 
 async function reload() {
-  const params = {
-    region: els.region.value,
-    game: els.game.value,
-    teams: [...followed].join(","),
-    onlyFollowed: els.onlyFollowed.checked ? "1" : "",
-  };
-  const [upcoming, live] = await Promise.all([
-    fetchUpcoming(params),
-    fetchLive(params),
-  ]);
-
-  // Optional client-side filter by followed
-  const filterByFollowed = (arr) =>
-    els.onlyFollowed.checked && followed.size
-      ? arr.filter(m => followed.has(m.teamAId) || followed.has(m.teamBId))
-      : arr;
-
-  renderMatches(filterByFollowed(upcoming), els.upcomingList);
-  renderMatches(filterByFollowed(live), els.liveList);
+    renderEmpty();
+    try {
+        const game = gameEl.value || "lol";
+        const ids = [...followed]; // turn Set → array
+        const upcoming = await fetchUpcoming({ game, teamIDs: ids });
+        renderMatches(upcoming, upcomingMatchList);
+    } catch (e) {
+        console.error(e);
+        upcomingMatchList.innerHTML = `<div class="card">Error loading matches</div>`;
+    }
 }
-// How to handle team search and selection
-els.teamsSearch.addEventListener("input", () => {
-  const searchTerm = els.teamsSearch.value.toLowerCase();
-  const filteredTeams = TEAMS.filter(team => team.name.toLowerCase().includes(searchTerm));
-  els.teamsList.innerHTML = filteredTeams.map(team => `
-    <li>
-      <label>
-        <input type="checkbox" value="${team.id}" ${followed.has(team.id) ? "checked" : ""}>
-        ${team.name}
-      </label>
-    </li>
-  `).join("");
-}); 
 
-// --- Team picker bits (reuse your earlier version) ---
-const TEAMS = []; // fetch from /api/teams on load if you want
-function setFollowed(ids) {
-  followed = new Set(ids);
-  localStorage.setItem(KEY, JSON.stringify([...followed]));
-  els.teamsSummary.textContent = `Followed teams (${followed.size})`;
+async function searchTeams(query, game, limit = 20, page = 1) {
+    const u = new URL("/api/teams", location.origin);
+    u.searchParams.set("q", query);
+    u.searchParams.set("game", game);
+    u.searchParams.set("limit", limit);
+    u.searchParams.set("page", page);
+    const res = await fetch(u);
+    if (!res.ok) {
+        throw new Error("Failed to fetch teams" + res.status);
+    }
+    return res.json();
 }
-els.btnSave.addEventListener("click", () => (els.teamsMenu.open = false));
-els.onlyFollowed.addEventListener("change", reload);
-els.region.addEventListener("change", reload);
-els.game.addEventListener("change", reload);
-els.refresh.addEventListener("click", reload);
 
-// Polling for live updates
-setInterval(reload, 30_000); // 30s; tune as needed
+const debouce = (fn, delay = 250) => {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            fn(...args);
+        }, delay);
+    };
+};
 
-// Init
-setFollowed([...followed]);
+const onTeamSearch = debouce(async () => {
+    query = teamSearchEl.value.trim();
+    teamsList.innerHTML = "";
+    if (query.length < 2) {
+        return;
+    }
+
+    try {
+        const items = await searchTeams(query, gameEl.value)
+        if (!items.length) {
+            teamsList.innerHTML = `<div style="opacity:.7;padding:.5rem 0">No teams found</div>`;
+            return;
+        }
+        teamsList.innerHTML = items.map(team => `
+            <label style="display:flex;gap:.5rem;align-items:center;padding:.15rem 0">
+                <input type="cehckbox" data-id="${team.id}" ${followed.has(team.id) ? "checked": ""}/>
+                <span>${team.name}</span>
+            </label>`).join("");
+        teamsList.querySelectorAll('input[type="checkbox"]').forEach(cb =>{
+            cb.addEventListener("change", (e) => {
+                const id = Number(e.target.dataset.id);
+                if (e.target.checked) { 
+                    followed.add(id); 
+                }
+                else {
+                    followed.delete(id);
+                }
+                saveFollowed();
+            })
+        })
+    } catch (e) {
+        console.error(e);
+    }
+}, 250);
+
+
+refreshBtn.addEventListener("click", reload);
+gameEl.addEventListener("change", reload);
+//regionEl.addEventListener("change", reload);
+onlyFollowedEl.addEventListener("change", reload);
+teamSearchEl.addEventListener("input", onTeamSearch);
+
+teamsSelectAllBtn.addEventListener("click", () => {
+    teamsList.querySelectorAll('input[type="checkbox"]').forEach( cb => {
+        cb.checked = true;
+        followed.add(Number(cb.dataset.id));
+    });
+    saveFollowed();
+})
+teamsSaveBtn.addEventListener("click", () => {
+    teamsMenu.open = false;
+    reload();
+})
+teamsClearBtn.addEventListener("click", () => {
+    followed.clear();
+    saveFollowed();
+    teamsList.querySelectorAll('input[type="checkbox"]').forEach( cb => 
+        cb.checked = false
+    );
+})
+
 reload();
+

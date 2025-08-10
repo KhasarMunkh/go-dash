@@ -73,8 +73,8 @@ func TeamSearchHandler(w http.ResponseWriter, r *http.Request) {
 		writeJSONResponse(w, teams)
 		return
 	}
-	// 2) If no specific IDs are provided, we can return a default set of teams
-	if idsQS == "" {
+	// 2) If no team names, we can return a default set of teams
+	if q == "" {
 		// return emtpy or popular suggestions, for now empty
 		writeJSONResponse(w, []Team{})
 		return
@@ -103,8 +103,10 @@ func getTeams(ctx context.Context, q string, game string, limit int, page int) (
 	query := u.Query()
 	query.Set("page[size]", strconv.Itoa(limit))
 	query.Set("page[number]", strconv.Itoa(page))
-	query.Set("filter[name]", q) // e.g., "t1,gen-g"
+	query.Set("search[name]", q) // e.g., "t1,gen-g"
 	u.RawQuery = query.Encode()  // e.g., "https://api.pandascore.co/lol/teams?page[size]=5&page[number]=1&filter[name]=t1,gen-g"
+
+	fmt.Println("Fetching teams from URL:", u.String())
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", u.String(), nil)
 	req.Header.Add("accept", "application/json")
@@ -167,7 +169,7 @@ func GetUpcomingMatchesHandler(w http.ResponseWriter, r *http.Request) {
 
 
 	game := strings.TrimSpace(r.URL.Query().Get("game")) // e.g., "lol"
-	idsQS := strings.TrimSpace(r.URL.Query().Get("ids")) // e.g., "135916,13917,2002"
+	idsQS := strings.TrimSpace(r.URL.Query().Get("teamIDs")) // e.g., "135916,13917,2002"
 	var teamIDs []int
 	if idsQS != "" {
 		var err error 

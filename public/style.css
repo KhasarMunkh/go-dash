@@ -1,4 +1,5 @@
-* { box-sizing: border-box }
+/*
+ { box-sizing: border-box }
 body { margin: 0; font-family: system-ui, sans-serif; }
 
 .topbar {
@@ -12,11 +13,11 @@ body { margin: 0; font-family: system-ui, sans-serif; }
 
 .layout {
   display:grid; gap:1rem; padding:1rem;
-  grid-template-columns: 2fr 1fr; /* main + live sidebar */
+  grid-template-columns: 2fr 1fr; 
 }
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
-  #live { order: -1; } /* show Live first on mobile if you like */
+  #live { order: -1; } 
 }
 
 .cards { display:grid; gap:.75rem; }
@@ -31,3 +32,4 @@ details .menu {
 }
 .teams-list { max-height:260px; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.25rem .75rem; }
 .menu-row { display:flex; gap:.5rem; margin:.5rem 0; }
+*/
