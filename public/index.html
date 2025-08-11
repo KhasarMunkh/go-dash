@@ -1,70 +1,75 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Esports Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header class="topbar">
-    <h1>Esports Dashboard</h1>
-    <div class="actions">
-      <button id="refreshBtn">Refresh</button>
-      <button id="settings">⚙️</button>
-    </div>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <title>Esports Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-  <section class="toolbar">
-    <label>Region
-      <select id="region">
-        <option value="">All</option>
-        <option value="NA">NA</option>
-        <option value="EU">EU</option>
-        <option value="KR">KR</option>
-        <option value="CN">CN</option>
-      </select>
-    </label>
-
-    <label>Game
-      <select id="game">
-        <option value="">All</option>
-        <option value="lol">LoL</option>
-        <option value="val">VALORANT</option>
-        <option value="dota2">Dota 2</option>
-      </select>
-    </label>
-
-    <details id="teamsMenu">
-      <summary><span id="teamsSummary">Followed teams (0)</span></summary>
-      <div class="menu">
-        <input id="teamSearch" type="search" placeholder="Search teams…" />
-        <div class="menu-row">
-          <button id="teamsSelectAllBtn" type="button">Select all</button>
-          <button id="teamsClearBtn" type="button">Clear</button>
-          <button id="teamsSaveBtn" type="button">Save</button>
-        </div>
-        <div id="teamsList" class="teams-list"></div>
+  <body>
+    <header class="sticky top-0">
+      <h1>Esports Dashboard</h1> 
+      <div class="actions">
+        <button id="refreshBtn">Refresh</button>
+        <button id="settings">⚙️</button>
       </div>
-    </details>
+    </header>
 
-    <label>
-      <input type="checkbox" id="onlyFollowed" />
-      Only followed
-    </label>
-  </section>
+    <section class="toolbar">
+      <label
+        >Region
+        <select id="region">
+          <option value="">All</option>
+          <option value="NA">NA</option>
+          <option value="EU">EU</option>
+          <option value="KR">KR</option>
+          <option value="CN">CN</option>
+        </select>
+      </label>
 
-  <main class="layout">
-    <section id="upcoming" class="column">
-      <h2>Upcoming</h2>
-      <div id="upcomingMatchList" class="cards"></div>
+      <label
+        >Game
+        <select id="game">
+          <option value="">All</option>
+          <option value="lol">LoL</option>
+          <option value="val">VALORANT</option>
+          <option value="dota2">Dota 2</option>
+        </select>
+      </label>
+
+      <details id="teamsMenu">
+        <summary><span id="teamsSummary">Followed teams (0)</span></summary>
+        <div class="menu">
+          <input id="teamSearch" type="search" placeholder="Search teams…" />
+          <div class="menu-row">
+            <button id="teamsSelectAllBtn" type="button">Select all</button>
+            <button id="teamsClearBtn" type="button">Clear</button>
+            <button id="teamsSaveBtn" type="button">Save</button>
+          </div>
+          <div id="teamsList" class="teams-list"></div>
+        </div>
+      </details>
+
+      <label>
+        <input type="checkbox" id="onlyFollowed" />
+        Only followed
+      </label>
     </section>
 
-    <aside id="live" class="column">
-      <h2>Live Now</h2>
-      <div id="liveMatchList" class="cards"></div>
-    </aside>
-  </main>
+    <main class="layout">
+      <section id="upcoming" class="column">
+        <h2>Upcoming</h2>
+        <div id="upcomingMatchList" class="cards"></div>
+      </section>
 
-  <script src="index.js" defer></script>
-</body>
+      <aside id="live" class="column">
+        <h2>Live Now</h2>
+        <div id="liveMatchList" class="cards"></div>
+      </aside>
+    </main>
+
+    <script src="index.js" defer></script>
+  </body>
 </html>

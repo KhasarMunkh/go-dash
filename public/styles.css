@@ -1,0 +1,41 @@
+/* public/style.css */
+:root { --ring: #7c3aed; }
+* { box-sizing: border-box; }
+html, body { margin: 0; font-family: system-ui, sans-serif; }
+
+.topbar {
+  position: sticky; top: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .75rem 1rem; border-bottom: 1px solid #eee; background: #fff;
+}
+
+.toolbar { 
+  position: sticky; top: 3.25rem;
+  display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+  padding: .5rem 1rem; border-bottom: 1px solid #eee; background: #fff;
+}
+
+.layout {
+  display: grid; gap: 1rem; padding: 1rem;
+  grid-template-columns: 2fr 1fr;
+}
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+.cards { display: grid; gap: .75rem; }
+.card {
+  border: 1px solid #e5e5e5; border-radius: 10px; padding: .75rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.team-logo, .league-logo { width: 24px; height: 24px; object-fit: contain; }
+.team-chip { 
+  display:inline-flex; align-items:center; justify-content:center;
+  width:24px; height:24px; border-radius:999px; border:1px solid #ccc; font-size:.75rem;
+}
+.vs { margin: 0 .25rem; opacity: .7; }
+details#teamsMenu { position: relative; }
+details#teamsMenu > summary { cursor: pointer; list-style: none; }
+details#teamsMenu[open] .menu {
+  position: absolute; z-index: 10; margin-top: .5rem; padding: .75rem;
+  width: min(560px, 90vw); background: #fff; border: 1px solid #ddd; border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+}

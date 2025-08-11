@@ -43,14 +43,19 @@ async function fetchUpcoming({ game, teamIDs }) {
     if (onlyFollowedEl.checked && teamIDs.length) {
         u.searchParams.set("teamIDs", teamIDs.join(","));
     }
-    const res = fetch(u);
+    const res = await fetch(u);
     if (!res.ok) {
-        throw new Error("Failed to fetch upcoming matches");
+        throw new Error("Failed to fetch upcoming matches: " + res.status);
     }
-    return res.json();
+    const data = await res.json();
+    if (!data || !Array.isArray(data)) {
+        throw new Error("Invalid data format received");
+    }
+    return data;
 }
 
 function renderUpcoming(list, mount) {
+    console.log(list);
     if (!list || !list.length) {
         mount.innerHTML = `<div class="card">No matches...</div>`;
         return;
@@ -59,7 +64,7 @@ function renderUpcoming(list, mount) {
         .map((m) => {
             const a = m.opponents?.[0]?.opponent ?? {};
             const b = m.opponents?.[1]?.opponent ?? {};
-            const when = new Date(m.scheduled_at).toLocaleString();
+            const when = m.scheduled_at ? new Date(m.scheduled_at).toLocaleString() : "TBD";
             const lName = m.league?.name ?? "";
 
             const aLogo = a.image_url
@@ -102,7 +107,7 @@ async function reload() {
         const game = gameEl.value || "lol";
         const ids = [...followed]; // turn Set → array
         const upcoming = await fetchUpcoming({ game, teamIDs: ids });
-        renderMatches(upcoming, upcomingMatchList);
+        renderUpcoming(upcoming, upcomingMatchList);
     } catch (e) {
         console.error(e);
         upcomingMatchList.innerHTML = `<div class="card">Error loading matches</div>`;
@@ -122,7 +127,7 @@ async function searchTeams(query, game, limit = 20, page = 1) {
     return res.json();
 }
 
-const debouce = (fn, delay = 250) => {
+const debounce = (fn, delay = 250) => {
     let timeout;
     return (...args) => {
         clearTimeout(timeout);
@@ -132,8 +137,8 @@ const debouce = (fn, delay = 250) => {
     };
 };
 
-const onTeamSearch = debouce(async () => {
-    query = teamSearchEl.value.trim();
+const onTeamSearch = debounce(async () => {
+    const query = teamSearchEl.value.trim();
     teamsList.innerHTML = "";
     if (query.length < 2) {
         return;
@@ -147,7 +152,7 @@ const onTeamSearch = debouce(async () => {
         }
         teamsList.innerHTML = items.map(team => `
             <label style="display:flex;gap:.5rem;align-items:center;padding:.15rem 0">
-                <input type="cehckbox" data-id="${team.id}" ${followed.has(team.id) ? "checked": ""}/>
+                <input type="checkbox" data-id="${team.id}" ${followed.has(team.id) ? "checked": ""}/>
                 <span>${team.name}</span>
             </label>`).join("");
         teamsList.querySelectorAll('input[type="checkbox"]').forEach(cb =>{

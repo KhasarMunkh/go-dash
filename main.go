@@ -278,6 +278,7 @@ func RequestMatches(ctx context.Context, game string, teamIDs []int) ([]Match, e
 
 // Helpers
 func writeJSONResponse(w http.ResponseWriter, v any) {
+	w.WriteHeader(http.StatusOK) 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(v)
 }
