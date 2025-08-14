@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"testing"
 )
 
 func TestRequestMatches(t *testing.T) {
-	matches, err := RequestMatches()
+	ctx := context.Background()
+	matches, err := RequestMatches(ctx, "lol", []int{135916}) // Example team ID for testing
 	if err != nil {
 		t.Fatalf("Failed to fetch matches: %v", err)
 	}

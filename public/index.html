@@ -1,75 +1,81 @@
 <!doctype html>
-<html lang="en">
-  <head>
+<html lang="en" class="dark">
+
+<head>
     <meta charset="utf-8" />
     <title>Esports Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+    <!-- built by the CLI -->
+    <link rel="stylesheet" href="/output.css" />
+</head>
 
-  <body>
-    <header class="sticky top-0">
-      <h1>Esports Dashboard</h1> 
-      <div class="actions">
-        <button id="refreshBtn">Refresh</button>
-        <button id="settings">⚙️</button>
-      </div>
+<body class="min-h-screen bg-zinc-950 text-zinc-100">
+    <header class="topbar">
+        <h1 class="text-lg font-semibold">Esports Dashboard</h1>
+        <div class="actions flex gap-2">
+            <button id="refreshBtn" class="btn bg-violet-500 
+                    hover:bg-violet-600 
+                    focus:outline-2 
+                    focus:outline-offset-2
+                    focus:outline-violet-500
+                    active:bg-violet-700 ..."">Refresh</button>
+      <button id=" settings" class="btn">⚙️</button>
+        </div>
     </header>
 
     <section class="toolbar">
-      <label
-        >Region
-        <select id="region">
-          <option value="">All</option>
-          <option value="NA">NA</option>
-          <option value="EU">EU</option>
-          <option value="KR">KR</option>
-          <option value="CN">CN</option>
-        </select>
-      </label>
+        <label class="flex items-center gap-2">Region
+            <select id="region" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1">
+                <option value="">All</option>
+                <option value="NA">NA</option>
+                <option value="EU">EU</option>
+                <option value="KR">KR</option>
+                <option value="CN">CN</option>
+            </select>
+        </label>
 
-      <label
-        >Game
-        <select id="game">
-          <option value="">All</option>
-          <option value="lol">LoL</option>
-          <option value="val">VALORANT</option>
-          <option value="dota2">Dota 2</option>
-        </select>
-      </label>
+        <label class="flex items-center gap-2">Game
+            <select id="game" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1">
+                <option value="">All</option>
+                <option value="lol">LoL</option>
+                <option value="val">VALORANT</option>
+                <option value="dota2">Dota 2</option>
+            </select>
+        </label>
 
-      <details id="teamsMenu">
-        <summary><span id="teamsSummary">Followed teams (0)</span></summary>
-        <div class="menu">
-          <input id="teamSearch" type="search" placeholder="Search teams…" />
-          <div class="menu-row">
-            <button id="teamsSelectAllBtn" type="button">Select all</button>
-            <button id="teamsClearBtn" type="button">Clear</button>
-            <button id="teamsSaveBtn" type="button">Save</button>
-          </div>
-          <div id="teamsList" class="teams-list"></div>
-        </div>
-      </details>
+        <details id="teamsMenu">
+            <summary class="btn"><span id="teamsSummary">Followed teams (0)</span></summary>
+            <div class="menu">
+                <input id="teamSearch" type="search" placeholder="Search teams…"
+                    class="w-full bg-zinc-950 border border-zinc-700 rounded px-3 py-2" />
+                <div class="menu-row">
+                    <button id="teamsSelectAllBtn" type="button" class="btn">Select all</button>
+                    <button id="teamsClearBtn" type="button" class="btn">Clear</button>
+                    <button id="teamsSaveBtn" type="button" class="btn">Save</button>
+                </div>
+                <div id="teamsList" class="teams-list"></div>
+            </div>
+        </details>
 
-      <label>
-        <input type="checkbox" id="onlyFollowed" />
-        Only followed
-      </label>
+        <label class="flex items-center gap-2">
+            <input type="checkbox" id="onlyFollowed" class="accent-zinc-300" />
+            Only followed
+        </label>
     </section>
 
-    <main class="layout">
-      <section id="upcoming" class="column">
-        <h2>Upcoming</h2>
-        <div id="upcomingMatchList" class="cards"></div>
-      </section>
+    <main class="grid gap-4 p-4 md:grid-cols-[2fr_1fr]">
+        <section id="upcoming">
+            <h2 class="mb-2 text-base font-semibold">Upcoming</h2>
+            <div id="upcomingMatchList" class="cards"></div>
+        </section>
 
-      <aside id="live" class="column">
-        <h2>Live Now</h2>
-        <div id="liveMatchList" class="cards"></div>
-      </aside>
+        <aside id="live">
+            <h2 class="mb-2 text-base font-semibold">Live Now</h2>
+            <div id="liveMatchList" class="cards"></div>
+        </aside>
     </main>
 
-    <script src="index.js" defer></script>
-  </body>
+    <script src="/index.js" defer></script>
+</body>
+
 </html>

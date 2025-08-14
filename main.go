@@ -15,7 +15,6 @@ import (
 
 	"github.com/joho/godotenv"
 )
-
 var (
 	base    = "https://api.pandascore.co"
 	api_key string
@@ -40,9 +39,26 @@ func main() {
 	mux.HandleFunc("/api/upcoming-matches", GetUpcomingMatchesHandler)
 
 	fmt.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	if err := http.ListenAndServe(":8080", withCORS(mux)); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
+}
+
+func withCORS(next http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    origin := r.Header.Get("Origin")
+    if origin == "http://localhost:5173" {
+      w.Header().Set("Access-Control-Allow-Origin", origin)
+      w.Header().Set("Vary", "Origin")
+      w.Header().Set("Access-Control-Allow-Credentials", "true")
+      w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+      w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+    }
+    if r.Method == http.MethodOptions {
+      w.WriteHeader(http.StatusNoContent); return
+    }
+    next.ServeHTTP(w, r)
+  })
 }
 
 // TeamSearchHandler handles requests to search for teams by name

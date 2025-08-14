@@ -1,0 +1,53 @@
+@import "tailwindcss";
+/* dark mode: tell the browser our palette is dark */
+html.dark {
+  color-scheme: dark;
+}
+
+/* layout helpers */
+.cards {
+  @apply grid gap-3;
+}
+.card {
+  @apply flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 p-3;
+    hover {
+}
+.team-logo,
+.league-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.team-chip {
+  @apply inline-flex items-center justify-center w-6 h-6 rounded-full border border-zinc-700 text-xs;
+}
+
+/* header + toolbar */
+.topbar {
+  @apply sticky top-0 z-20 flex items-center justify-between bg-zinc-950/90 backdrop-blur border-b border-zinc-800 px-4 py-3;
+}
+.toolbar {
+  @apply sticky top-[3.25rem] z-10 flex flex-wrap items-center gap-3 bg-zinc-950/90 backdrop-blur border-b border-zinc-800 px-4 py-2;
+}
+.btn {
+  @apply px-3 py-1.5 rounded-lg border border-zinc-700 hover:bg-zinc-800;
+}
+
+/* details popover */
+#teamsMenu {
+  position: relative;
+}
+#teamsMenu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+#teamsMenu[open] .menu {
+  @apply absolute z-30 mt-2 w-[min(560px,90vw)] rounded-xl border border-zinc-700 bg-zinc-900 p-3 shadow-xl;
+}
+.menu-row {
+  @apply flex gap-2 my-2;
+}
+.teams-list {
+  max-height: 260px;
+  overflow: auto;
+}
