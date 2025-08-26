@@ -1,5 +1,6 @@
 package main
 
+
 import (
 	"context"
 	"encoding/json"
@@ -114,6 +115,8 @@ func getTeams(ctx context.Context, q string, game string, limit int, page int) (
 		path = "/" + game + path // e.g., "/lol/teams"
 	}
 
+	fmt.Println("Searching teams with query:", q, "game:", game, "limit:", limit, "page:", page)
+
 	u := mustURL(base, path) // e.g., "https://api.pandascore.co/lol/teams"
 
 	query := u.Query()
@@ -201,6 +204,12 @@ func GetUpcomingMatchesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch matches", http.StatusInternalServerError)
 		return
 	}
+
+	// send back only 5 matches
+	if len(m) > 5 {
+		m = m[:5] // Limit to 5 matches
+	}
+
 	writeJSONResponse(w, m)
 }
 
